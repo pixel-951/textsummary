@@ -3,9 +3,9 @@ import json
 import pika
 import uuid
 
-
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 """
 Entry to the backend services. Accepts requests and delegates to other services. 
@@ -35,6 +35,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/api/job")
 async def add_job(text: str):
