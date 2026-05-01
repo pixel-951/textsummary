@@ -1,0 +1,1 @@
+# poetry install, poetry activate, use the env with entry to fastapi env to start server
