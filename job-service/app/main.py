@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.queue_handler import QueueHandler
+from app.schemas import JobCreateRequest, JobCreateResponse
 from app.settings import settings
 
 """
@@ -32,12 +33,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/api/job")
-async def add_job(text: str):
+@app.post("/api/job", response_model=JobCreateResponse)
+async def add_job(request: JobCreateRequest):
     # TODO: validate input, create job object, add to queue, return error code
-    print(f"Adding {text} to queue.")
+    print(f"Adding {request.text} to queue.")
  
-    return queue_handler.publish(text=text)
+    return queue_handler.publish(text=request.text)
 
 
 # queue_handler: owns channel and connection; declares queue and publishes job to it; uses job_processor 

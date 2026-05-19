@@ -33,6 +33,8 @@ class QueueHandler:
 
     def publish(self, text: str) -> dict: 
         job_id, job = self.job_creator.create_job(text)
+        if self.channel is None:
+            raise RuntimeError("Queue channel is not initialized")
         self.channel.basic_publish(exchange='',
                       routing_key=self.queue_name,
                       body=job)

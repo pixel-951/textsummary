@@ -10,10 +10,17 @@ function App() {
     setStatus('processing')
     setResult('')
 
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+    };
+
     // POST to job-service
-    const response = await fetch('http://localhost:8000/api/job?text=' + encodeURIComponent(text), {
-      method: 'POST'
-    })
+    const response = await fetch('http://localhost:8000/api/job', requestOptions)
+    if (!response.ok) {
+      throw new Error(`Job request failed: ${response.status}`);
+    }
     const data = await response.json()
     const jobId = data.job_id
 
