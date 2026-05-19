@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-import json
-import pika
-import uuid
-
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.queue_handler import QueueHandler
+from app.schemas import JobCreateRequest, JobCreateResponse
+from app.settings import settings
 
 """
 Entry to the backend services. Accepts requests and delegates to other services. 
@@ -16,25 +15,16 @@ GET / serves frontend
 
 """
 
+# TODO gets settings
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # create queue connection and channel on startup such that there can be potential error handling and reconnecting
-    global channel, connection
-
-    # create connection to queue and channel
-    # sender
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    # receiver (idempotent, needs it to avoid race condition(?) such that messages do not get dropped)
-    channel.queue_declare(queue='jobs', durable=True) # not sure if needed, will be created in model-service as well
-    yield 
-   
-    #connection.close()
+# TODO arguments: port, host, queue name
+queue_handler = QueueHandler(host=settings.rabbitmq_host,
+    port=settings.rabbitmq_port,
+    queue_name=settings.queue_name)
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=queue_handler.lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,18 +33,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/api/job")
-async def add_job(text: str):
+@app.post("/api/job", response_model=JobCreateResponse)
+async def add_job(request: JobCreateRequest):
     # TODO: validate input, create job object, add to queue, return error code
-    print(f"Adding {text} to queue.")
-    job_id = str(uuid.uuid4())
-    message = json.dumps({"job_id": job_id, "text": text})
-    channel.basic_publish(exchange='',
-                      routing_key='jobs',
-                      body=message)
-
-    
-    return {"job_id": job_id}
+    print(f"Adding {request.text} to queue.")
+ 
+    return queue_handler.publish(text=request.text)
 
 
-
+# queue_handler: owns channel and connection; declares queue and publishes job to it; uses job_processor 
+# job_processor: receives text string, returns json byte string with job_id
