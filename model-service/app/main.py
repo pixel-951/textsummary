@@ -1,9 +1,9 @@
 #!/usr/bin/env pyton
-from job_processor import JobProcessor
-from notifier import Notifier
-from settings import Settings
-from summarizer import Summarizer
-from queue_handler import QueueHandler
+from app.job_processor import JobProcessor
+from app.notifier import Notifier
+from app.settings import Settings
+from app.summarizer import Summarizer
+from app.queue_handler import QueueHandler
 
 
 settings = Settings()

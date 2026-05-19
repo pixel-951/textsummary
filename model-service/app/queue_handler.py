@@ -2,7 +2,7 @@
 import pika
 import time
 
-from job_processor import JobProcessor
+from app.job_processor import JobProcessor
 
 
 

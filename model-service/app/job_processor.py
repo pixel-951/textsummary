@@ -1,6 +1,6 @@
 import json
-from notifier import Notifier
-from summarizer import Summarizer
+from app.notifier import Notifier
+from app.summarizer import Summarizer
 
 
 class JobProcessor: 
