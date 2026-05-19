@@ -9,8 +9,9 @@ from job_processor import JobProcessor
 
 class QueueHandler: 
 
-    def __init__(self, job_processor:JobProcessor, address: str='localhost', queue_name: str='jobs'):
-        self.address = address
+    def __init__(self, job_processor:JobProcessor, port: int=5672, host: str='localhost', queue_name: str='jobs'):
+        self.host = host
+        self.port = port
         self.queue_name = queue_name
         self.channel = self.connect().channel()
 
@@ -21,7 +22,7 @@ class QueueHandler:
         while True:
             try:
                 return pika.BlockingConnection(
-                    pika.ConnectionParameters(self.address)
+                    pika.ConnectionParameters(host=self.host, port=self.port)
                 )
             except Exception:
                 print("Retrying...")

@@ -1,17 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env pyton
 from job_processor import JobProcessor
 from notifier import Notifier
+from settings import Settings
 from summarizer import Summarizer
 from queue_handler import QueueHandler
 
 
+settings = Settings()
 
 
 
-summarizer = Summarizer()
-notifier = Notifier()
+
+summarizer = Summarizer(model=settings.model_name, max_length=settings.summary_max_length)
+notifier = Notifier(host=settings.notification_url)
 job_processor = JobProcessor(summarizer=summarizer, notifier=notifier)
-queue_handler = QueueHandler(job_processor=job_processor, address='localhost', queue_name='jobs')
+queue_handler = QueueHandler(job_processor=job_processor, port=settings.rabbitmq_port, host=settings.rabbitmq_host, queue_name=settings.queue_name)
 queue_handler.start()
 
 
