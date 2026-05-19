@@ -18,7 +18,7 @@ function App() {
     const jobId = data.job_id
 
     // open WebSocket and register job_id
-    ws.current = new WebSocket('ws://localhost:8002/ws')
+    ws.current = new WebSocket('ws://localhost:8001/ws')
     ws.current.onopen = () => {
       ws.current.send(jobId)
     }
