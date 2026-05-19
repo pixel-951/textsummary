@@ -10,7 +10,7 @@ class JobProcessor:
         self.summarizer = summarizer
         self.notifier = notifier
 
-    def process_job(self, data: json) -> str: 
+    def process_job(self, data: bytes) -> str: 
         loaded = json.loads(data.decode())
         # validation etc..
         job_id = loaded['job_id']

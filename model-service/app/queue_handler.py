@@ -31,7 +31,13 @@ class QueueHandler:
         # TODO: error handling
         summary = self.job_processor.process_job(body)
         print(f"Obtained summary: {summary}")
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+        try:
+            summary = self.job_processor.process_job(body)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+        except Exception as exc:
+            print(f"Failed to process job: {exc}")
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
      
 
     def start(self) -> None: 
