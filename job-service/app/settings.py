@@ -10,9 +10,6 @@ class Settings(BaseSettings):
     rabbitmq_host: str = "localhost"
     rabbitmq_port: int = 5672
     queue_name: str = "jobs"
-
-    fastapi_port: str = "8000"
-    fastapi_host: str = "localhost"
     
 
 
