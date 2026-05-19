@@ -27,7 +27,8 @@ class QueueHandler:
         # receiver (idempotent, needs it to avoid race condition(?) such that messages do not get dropped)
         self.channel.queue_declare(queue=self.queue_name, durable=True) 
         yield 
-        #self.connection.close()
+        if self.connection and self.connection.is_open:
+            self.connection.close()
     
 
     def publish(self, text: str) -> dict: 
