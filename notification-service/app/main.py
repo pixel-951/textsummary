@@ -18,18 +18,18 @@ ws websocket
 
 
 
-app = FastAPI()
+server = FastAPI()
 
 connection_manager = ConnectionManager()
 
-@app.websocket("/ws")
+@server.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     
     await connection_manager.handle_connection(websocket=websocket)
 
 
 
-@app.post("/api/notification")
+@server.post("/api/notification")
 async def receive_notification(job: NotificationPayload):
 
     await connection_manager.handle_result(job=job)
