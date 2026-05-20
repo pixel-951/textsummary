@@ -24,3 +24,6 @@ COPY --chown=appuser:appuser app ./app
 USER appuser
 
 CMD ["uvicorn", "app.main:server", "--host", "0.0.0.0", "--port", "8000"]
+
+# sudo docker run --rm -d --name job-service --network textsummary-net -p 8000:8000 -e RABBITMQ_HOST=rabbitmq -e RABBITMQ_PORT=5672 -e QUEUE_NAME=jobs job-service
+# rabbit: sudo docker run -d --name rabbitmq --network textsummary-net -p 5672:5672 -p 15672:15672 rabbitmq:3-management

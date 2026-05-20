@@ -24,3 +24,5 @@ COPY --chown=appuser:appuser app ./app
 USER appuser
 
 CMD ["uvicorn", "app.main:server", "--host", "0.0.0.0", "--port", "8001"]
+
+#sudo docker run --rm -d --name notification-service --network textsummary-net -p 8001:8001 notification-service

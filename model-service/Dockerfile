@@ -23,3 +23,5 @@ USER appuser
 
 CMD ["python", "-m", "app.main"]
 # CMD ["poetry", "run", "python", "-m", "app.main"]
+
+#sudo docker run -d --name model-service --network textsummary-net -e RABBITMQ_HOST=rabbitmq -e RABBITMQ_PORT=5672 -e QUEUE_NAME=jobs -e NOTIFICATION_URL=http://notification-service:8001/api/notification model-service
