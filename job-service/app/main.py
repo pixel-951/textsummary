@@ -24,16 +24,16 @@ queue_handler = QueueHandler(host=settings.rabbitmq_host,
     queue_name=settings.queue_name)
 
 
-app = FastAPI(lifespan=queue_handler.lifespan)
+server = FastAPI(lifespan=queue_handler.lifespan)
 
-app.add_middleware(
+server.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/api/job", response_model=JobCreateResponse)
+@server.post("/api/job", response_model=JobCreateResponse)
 async def add_job(request: JobCreateRequest):
     # TODO: validate input, create job object, add to queue, return error code
     print(f"Adding {request.text} to queue.")
