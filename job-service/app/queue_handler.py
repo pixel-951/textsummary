@@ -1,4 +1,6 @@
+import asyncio
 import pika
+import socket
 
 
 from contextlib import asynccontextmanager
@@ -22,7 +24,14 @@ class QueueHandler:
 
         # create connection to queue and channel
         # sender
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host, port=self.port))
+        while True: 
+            try: 
+                self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host, port=self.port))
+                print(f"Successful connection!")
+                break
+            except (pika.exceptions.AMQPConnectionError, pika.exceptions.StreamLostError, socket.gaierror) as exc:
+                print(f"RabbitMQ not ready yet: {exc}. Retrying in 2s...")
+                await asyncio.sleep(2)
         self.channel = self.connection.channel()
         # receiver (idempotent, needs it to avoid race condition(?) such that messages do not get dropped)
         self.channel.queue_declare(queue=self.queue_name, durable=True) 
