@@ -13,38 +13,56 @@ class QueueHandler:
         self.host = host
         self.port = port
         self.queue_name = queue_name
-        self.channel = self.connect().channel()
-
-     
         self.job_processor = job_processor
+        self.connection = None
+        self.channel = None
 
-    def connect(self) -> pika.BlockingConnection:
+    def connect(self):
         while True:
             try:
-                return pika.BlockingConnection(
+                self.connection =  pika.BlockingConnection(
                     pika.ConnectionParameters(host=self.host, port=self.port)
                 )
+                self.channel = self.connection.channel()
+                return
             except Exception:
                 print("Retrying...")
                 time.sleep(2)
 
     def consume_job(self, ch, method, properties, body): # correct signature?
-        # TODO: error handling
-        summary = self.job_processor.process_job(body)
-        print(f"Obtained summary: {summary}")
 
         try:
             summary = self.job_processor.process_job(body)
             ch.basic_ack(delivery_tag=method.delivery_tag)
+            print(f"Obtained summary: {summary}")
         except Exception as exc:
             print(f"Failed to process job: {exc}")
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
      
 
     def start(self) -> None: 
-        self.channel.queue_declare(queue=self.queue_name, durable=True)
-        self.channel.basic_consume(queue=self.queue_name, on_message_callback=self.consume_job)
-        self.channel.start_consuming()
+        
+        while True: 
+            try: 
+                self.connect()
+                self.channel.queue_declare(queue=self.queue_name, durable=True)
+                self.channel.basic_consume(queue=self.queue_name, on_message_callback=self.consume_job)
+                self.channel.start_consuming()
+            except (pika.exceptions.ConnectionClosedByBroker,
+                pika.exceptions.StreamLostError,
+                pika.exceptions.AMQPConnectionError,
+                pika.exceptions.ChannelWrongStateError) as exec: 
+                print(f"Connection closed by peer, retrying: {exec}")
+                time.sleep(2)
+            finally:
+                try:
+                    if self.connection and self.connection.is_open:
+                        self.connection.close()
+                except Exception:
+                    pass
+
+           
+                
 
 
 
