@@ -6,7 +6,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV POETRY_NO_INTERACTION=1
 
-ENV HF_HOME=/home/appuser/.cache/huggingface
 
 
 WORKDIR /app
@@ -18,12 +17,13 @@ RUN poetry install --only main --no-root
 
 # add user so container is not root
 RUN useradd --create-home appuser
+RUN mkdir -p /home/appuser/.cache/huggingface \
+&& chown -R appuser:appuser /home/appuser/.cache
 
+ENV HF_HOME=/home/appuser/.cache/huggingface
 # copy app dir and apply user permissions
 COPY --chown=appuser:appuser app ./app
 
-RUN mkdir -p /home/appuser/.cache/huggingface \
-    && chown -R appuser:appuser /home/appuser/.cache
 
 USER appuser
 
