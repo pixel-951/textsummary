@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED=1
 ENV POETRY_NO_INTERACTION=1
 
 
+
 WORKDIR /app
 
 RUN pip install --no-cache-dir poetry
@@ -16,9 +17,14 @@ RUN poetry install --only main --no-root
 
 # add user so container is not root
 RUN useradd --create-home appuser
+RUN mkdir -p /home/appuser/.cache/huggingface \
+&& chown -R appuser:appuser /home/appuser/.cache
 
+ENV HF_HOME=/home/appuser/.cache/huggingface
 # copy app dir and apply user permissions
 COPY --chown=appuser:appuser app ./app
+
+
 USER appuser
 
 CMD ["python", "-m", "app.main"]

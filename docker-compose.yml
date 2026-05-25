@@ -39,6 +39,8 @@ services:
         condition: service_healthy
       notification-service:
         condition: service_started
+    volumes: 
+      - model-service-weights:/home/appuser/.cache/huggingface
 
   frontend:
     build: ./frontend
@@ -47,3 +49,6 @@ services:
     depends_on:
       - job-service
       - notification-service
+
+volumes:
+  model-service-weights:
