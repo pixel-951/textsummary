@@ -6,6 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV POETRY_NO_INTERACTION=1
 
+ENV HF_HOME=/home/appuser/.cache/huggingface
+
 
 WORKDIR /app
 
@@ -19,6 +21,10 @@ RUN useradd --create-home appuser
 
 # copy app dir and apply user permissions
 COPY --chown=appuser:appuser app ./app
+
+RUN mkdir -p /home/appuser/.cache/huggingface \
+    && chown -R appuser:appuser /home/appuser/.cache
+
 USER appuser
 
 CMD ["python", "-m", "app.main"]
