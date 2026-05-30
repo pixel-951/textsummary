@@ -1,9 +1,6 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -12,8 +9,6 @@ services:
 
   job-service:
     build: ./job-service
-    ports:
-      - "8000:8000"
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
@@ -24,9 +19,7 @@ services:
 
   notification-service:
     build: ./notification-service
-    ports:
-      - "8001:8001"
-
+   
   model-service:
     build: ./model-service
     environment:
@@ -45,7 +38,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
+      - "80:80"
     depends_on:
       - job-service
       - notification-service
