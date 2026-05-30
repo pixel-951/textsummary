@@ -1,9 +1,6 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -22,9 +19,7 @@ services:
 
   notification-service:
     build: ./notification-service
-    ports:
-      - "8001:8001"
-
+   
   model-service:
     build: ./model-service
     environment:
