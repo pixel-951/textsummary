@@ -59,6 +59,10 @@ class QueueHandler:
         self.channel.basic_publish(exchange='', 
                         routing_key=self.queue_name,
                         body=job)
+        
+    def is_ready(self) -> bool: 
+        return self.connection is not None and self.connection.is_open and self.channel is not None and self.channel.is_open
+    
 
     def publish(self, text: str) -> dict: 
         job_id, job = self.job_creator.create_job(text)

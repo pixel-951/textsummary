@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.queue_handler import QueueHandler
-from app.schemas import JobCreateRequest, JobCreateResponse
+from app.schemas import JobCreateRequest, JobCreateResponse, HealthCheck, ReadinessCheck
 from app.settings import settings
 
 """
@@ -33,7 +33,7 @@ server.add_middleware(
     allow_headers=["*"],
 )
 
-@server.post("/api/job", response_model=JobCreateResponse)
+@server.post("/api/job", status_code=status.HTTP_202_ACCEPTED, response_model=JobCreateResponse)
 async def add_job(request: JobCreateRequest):
     # TODO: validate input, create job object, add to queue, return error code
     print(f"Adding {request.text} to queue.")
@@ -41,5 +41,17 @@ async def add_job(request: JobCreateRequest):
     return queue_handler.publish(text=request.text)
 
 
-# queue_handler: owns channel and connection; declares queue and publishes job to it; uses job_processor 
-# job_processor: receives text string, returns json byte string with job_id
+@server.get("/health", status_code=status.HTTP_200_OK, response_model=HealthCheck)
+async def health_check():
+    return HealthCheck(status="OK")
+
+
+@server.get("/ready", status_code=status.HTTP_200_OK, response_model=ReadinessCheck)
+async def readiness_check():
+    if not queue_handler.is_ready():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RabbitMQ connection is not ready",
+        )
+
+    return ReadinessCheck(status="READY")

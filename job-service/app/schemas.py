@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 
 
 class JobCreateRequest(BaseModel):
@@ -7,3 +8,10 @@ class JobCreateRequest(BaseModel):
 
 class JobCreateResponse(BaseModel):
     job_id: str
+
+class HealthCheck(BaseModel):
+    status: Literal["OK"]
+
+
+class ReadinessCheck(BaseModel):
+    status: Literal["READY"]
