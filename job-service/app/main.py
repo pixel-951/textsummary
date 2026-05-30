@@ -33,7 +33,7 @@ server.add_middleware(
     allow_headers=["*"],
 )
 
-@server.post("/api/job", response_model=JobCreateResponse)
+@server.post("/api/job", status_code=status.HTTP_202_ACCEPTED, response_model=JobCreateResponse)
 async def add_job(request: JobCreateRequest):
     # TODO: validate input, create job object, add to queue, return error code
     print(f"Adding {request.text} to queue.")
@@ -41,7 +41,7 @@ async def add_job(request: JobCreateRequest):
     return queue_handler.publish(text=request.text)
 
 
-server.get("/health", status_code=status.HTTP_200_OK, response_model=HealthCheck)
+@server.get("/health", status_code=status.HTTP_200_OK, response_model=HealthCheck)
 async def health_check():
     return HealthCheck(status="OK")
 

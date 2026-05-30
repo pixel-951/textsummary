@@ -29,7 +29,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 
-@server.post("/api/notification")
+@server.post("/api/notification", status_code=status.HTTP_202_ACCEPTED,)
 async def receive_notification(job: NotificationPayload):
 
     await connection_manager.handle_result(job=job)
@@ -37,7 +37,7 @@ async def receive_notification(job: NotificationPayload):
    
 
     
-server.get("/health", status_code=status.HTTP_200_OK, response_model=HealthCheck)
+@server.get("/health", status_code=status.HTTP_200_OK, response_model=HealthCheck)
 async def health_check():
     return HealthCheck(status="OK")
 
