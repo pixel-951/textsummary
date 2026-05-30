@@ -87,7 +87,7 @@ jobs:
 
       - name: Run system tests
         env:
-          BASE_URL: http://localhost:8080
+          BASE_URL: http://localhost:80
         run: |
           pytest -m system tests/system
 
