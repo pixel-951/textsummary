@@ -1,0 +1,61 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  job-service:
+    image: ghcr.io/pixel-951/textsummary-job-service:latest
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      QUEUE_NAME: jobs
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  notification-service:
+    image: ghcr.io/pixel-951/textsummary-notification-service:latest
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  model-service:
+    image: ghcr.io/pixel-951/textsummary-model-service:latest
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      QUEUE_NAME: jobs
+      NOTIFICATION_URL: http://notification-service:8001/api/notification
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - model-service-weights:/home/appuser/.cache/huggingface
+
+  frontend:
+    image: ghcr.io/pixel-951/textsummary-frontend:latest
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      job-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+
+volumes:
+  model-service-weights:
