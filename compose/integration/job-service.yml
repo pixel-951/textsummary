@@ -1,0 +1,8 @@
+services:
+  rabbitmq:
+    ports:
+      - "5672:5672"
+
+  job-service:
+    ports:
+      - "18000:8000"
