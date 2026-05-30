@@ -21,7 +21,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    start_period: 10s 
+      start_period: 10s 
 
   notification-service:
     build: ./notification-service
@@ -30,7 +30,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    start_period: 10s
+      start_period: 10s
    
   model-service:
     build: ./model-service
