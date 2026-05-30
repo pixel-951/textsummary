@@ -68,7 +68,7 @@ jobs:
 
       - name: Start Compose stack
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
+          docker compose docker-compose.yml up -d --build
 
       - name: Wait for frontend
         run: |
@@ -81,8 +81,8 @@ jobs:
             sleep 2
           done
 
-          docker compose -f docker-compose.yml -f docker-compose.test.yml ps
-          docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color
+          docker compose docker-compose.yml ps
+          docker compose docker-compose.yml logs --no-color
           exit 1
 
       - name: Run system tests
@@ -94,10 +94,10 @@ jobs:
       - name: Show logs on failure
         if: failure()
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml ps
-          docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color
+          docker compose docker-compose.yml ps
+          docker compose docker-compose.yml logs --no-color
 
       - name: Shut down Compose stack
         if: always()
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml down -v
+          docker compose  docker-compose.yml down -v
