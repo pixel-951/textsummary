@@ -1,0 +1,11 @@
+{
+    email you@example.com
+}
+
+researchpal.xyz {
+    reverse_proxy frontend:80
+}
+
+www.researchpal.xyz {
+    reverse_proxy frontend:80
+}
